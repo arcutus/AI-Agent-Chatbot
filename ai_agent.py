@@ -11,9 +11,27 @@ OPENAI_API_KEY= os.environ.get("OPENAI_API_KEY")
 from langchain_groq import ChatGroq
 from langchain_tavily import TavilySearch
 
-groq_llm = ChatGroq(model="openai/gpt-oss-120b")
+def get_response_from_agent(llm_id,query,allow_search,system_prompt,provider):
+    if provider == "groq":
+        groq_llm = ChatGroq(model=llm_id)
+        
+    elif provider == "openai":
+        from langchain.chat_models import ChatOpenAI
+        openai_llm = ChatOpenAI(model_name=llm_id, openai_api_key=OPENAI_API_KEY)
+        search_tool = TavilySearch(max_results=3)if allow_search else{}
+        agent = create_agent(
+            model=openai_llm,
+            tools=[search_tool] if allow_search else [],
+            system_prompt=system_prompt
+        )
+    else:
+        raise ValueError("Invalid model provider")
 
+    response = agent.invoke({"messages": [("user", query)]})
+    return response["messages"][-1].content
+   
 
+groq_llm = ChatGroq(model="openai/gpt-oss-12b")
 search_tool = TavilySearch(max_results=3)
 
 #setting up the agent
@@ -28,5 +46,12 @@ agent = create_agent(
 )
 
 query=input("Enter your query: ")
+state={"messages":query}
+response = agent.invoke(state)
+messages = response.get("messages")
+ai_messages =[messages.content for messages in messages if isinstance(message, AIMessage)]
+messages[-1] if ai_messages else "No response from the agent."
+
+#query=input("Enter your query: ")
 response = agent.invoke({"messages": [("user", query)]})
 print(response["messages"][-1].content)
