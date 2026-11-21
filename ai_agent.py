@@ -1,4 +1,7 @@
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
 TAVILY_API_KEY = os.environ.get("TAVILY_API_KEY")
@@ -6,10 +9,8 @@ OPENAI_API_KEY= os.environ.get("OPENAI_API_KEY")
 
 #seting up LLm and Tools
 from langchain_groq import ChatGroq
-from langchain_openai import ChatOpenAI
 from langchain_tavily import TavilySearch
 
-openai_llm = ChatOpenAI(model="gpt-40-mini")
 groq_llm = ChatGroq(model="openai/gpt-oss-120b")
 
 
@@ -26,6 +27,6 @@ agent = create_agent(
     system_prompt=system_prompt
 )
 
-query="Tell me about the trends in the crypto market in 2024"
+query=input("Enter your query: ")
 response = agent.invoke({"messages": [("user", query)]})
 print(response["messages"][-1].content)
