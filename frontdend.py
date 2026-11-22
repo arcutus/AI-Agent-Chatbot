@@ -21,12 +21,23 @@ allow_web_search=st.checkbox("Allow Web Search")
 user_query=st.text_area("Enter your query",height=70,placeholder="ask anything...")
 
 #get response from backend
-if st.button("Ask Query"):
 
-   if user_query.strip():
-     response="Hi, I am your AI agent. I will process your query and provide a response shortly."
-     st.subheader("Agent Response")
-     st.markdown(f"**Final Response:** {response}")
+API_URL="http://127.0.0.1:8000/chat"
+
+if st.button("Ask Query"):
+ if user_query.strip():
+        import requests
+        payload={
+            "model_name": selected_model,
+            "model_provider": provider,
+            "system_prompt": system_prompt,
+            "messages": [user_query],
+            "allow_search": allow_web_search
+        }
+
+        response="Hi, I am your AI agent. I will process your query and provide a response shortly."
+        st.subheader("Agent Response")
+        st.markdown(f"**Final Response:** {response}")
 
 #connect to backend API via URl
 
