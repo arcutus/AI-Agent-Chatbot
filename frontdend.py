@@ -1,6 +1,6 @@
 import streamlit as st
 
-st.set_page_config(page_title="LangGraph Agent UI", layout="wide",page_icon="🤖")
+st.set_page_config(page_title="LangGraph Agent UI", layout="centered",page_icon="🤖")
 st.title("AI Chatbot Agents")
 st.write("Create and Interact with AI agents using different models and providers.")
 
@@ -19,3 +19,15 @@ elif provider=="openai":
 allow_web_search=st.checkbox("Allow Web Search")
 
 user_query=st.text_area("Enter your query",height=70,placeholder="ask anything...")
+
+#get response from backend
+if st.button("Ask Query"):
+
+   if user_query.strip():
+     response="Hi, I am your AI agent. I will process your query and provide a response shortly."
+     st.subheader("Agent Response")
+     st.markdown(f"**Final Response:** {response}")
+
+#connect to backend API via URl
+
+
