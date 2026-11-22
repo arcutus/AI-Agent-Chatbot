@@ -13,7 +13,6 @@ class RequestState(BaseModel):
 Allowed_model_providers = [
     "openai/gpt-oss-20b",
     "openai/gpt-oss-120b",
-    "mixtral-8x7b-32768",
     "gpt-4o-mini",
     "gpt-4o"
 ]
@@ -23,19 +22,21 @@ app = FastAPI(title="Langgraph AI Agent")
 @app.post("/chat")
 def chat_endpoint(request: RequestState):
     if request.model_name not in Allowed_model_providers:
-        return {"error": "Invalid model provider"}
+        return {"error": f"Invalid model name: {request.model_name}. Allowed: {Allowed_model_providers}"}
 
-    response = get_response_from_agent(
-        llm_id=request.model_name,
-        query=request.messages[-1],
-        allow_search=request.allow_search,
-        system_prompt=request.system_prompt,
-        provider=request.model_provider
-    )
-    return {"response": response}
+    try:
+        response = get_response_from_agent(
+            llm_id=request.model_name,
+            query=request.messages[-1],
+            allow_search=request.allow_search,
+            system_prompt=request.system_prompt,
+            provider=request.model_provider
+        )
+        return {"response": response}
+    except Exception as e:
+        return {"error": str(e)}
 
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("backend:app", host="127.0.0.1", port=8000, reload=True)
-

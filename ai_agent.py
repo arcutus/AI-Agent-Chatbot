@@ -18,17 +18,23 @@ from langchain.agents import create_agent
 def get_response_from_agent(llm_id, query, allow_search, system_prompt, provider):
     tools = [TavilySearch(max_results=3)] if allow_search else []
 
+    prompt = system_prompt.strip() if system_prompt and system_prompt.strip() else (
+        "You are a helpful assistant that can answer questions using the tools provided. "
+        "Use the tools to find information and provide accurate answers. "
+        "Act as an AI chatbot who is smart and friendly."
+    )
+
     if provider == "groq":
         llm = ChatGroq(model=llm_id, api_key=GROQ_API_KEY)
     elif provider == "openai":
         llm = ChatOpenAI(model=llm_id, api_key=OPENAI_API_KEY)
     else:
-        raise ValueError("Invalid model provider")
+        raise ValueError(f"Invalid model provider: {provider}")
 
     agent = create_agent(
         model=llm,
         tools=tools,
-        system_prompt=system_prompt
+        system_prompt=prompt
     )
 
     response = agent.invoke({"messages": [("user", query)]})
@@ -39,7 +45,7 @@ if __name__ == "__main__":
     groq_llm = ChatGroq(model="openai/gpt-oss-20b", api_key=GROQ_API_KEY)
     search_tool = TavilySearch(max_results=3)
 
-    system_prompt = (
+    default_system_prompt = (
         "You are a helpful assistant that can answer questions using the tools provided. "
         "Use the tools to find information and provide accurate answers. "
         "Act as an AI chatbot who is smart and friendly."
@@ -48,7 +54,7 @@ if __name__ == "__main__":
     agent = create_agent(
         model=groq_llm,
         tools=[search_tool],
-        system_prompt=system_prompt
+        system_prompt=default_system_prompt
     )
 
     query = input("Enter your query: ")
